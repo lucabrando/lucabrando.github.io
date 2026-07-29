@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Bestemmie — field mark explorer</title>
+<meta name="theme-color" content="#2537E8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232537E8'/%3E%3Ctext x='16' y='23' font-family='ui-monospace,Menlo,monospace' font-size='21' font-weight='700' fill='%23fff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<!--
+  Bestemmie — letter-field mark explorer (v5w)
+  Fork of the Illegible field mark. The embedded word is drawn at random from a
+  small pool instead of being fixed, so the grid resizes to whatever word landed.
+  Cell size is computed in JS so a 12-letter word never overflows a phone.
+-->
+<style>
+  :root{
+    --field:#2537E8;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#2537E8}
+  .canvas{
+    background:var(--field);min-height:100vh;
+    padding:clamp(22px,4vw,46px) clamp(16px,4vw,40px) clamp(28px,5vw,52px);
+    font-family:var(--mono);color:#fff;transition:background .4s ease;
+  }
+  .stage{max-width:680px;margin:0 auto}
+  .eyebrow{
+    display:flex;align-items:baseline;gap:.6em;flex-wrap:wrap;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:rgba(255,255,255,.55);margin:0 0 clamp(20px,3.5vw,34px);
+  }
+  .eyebrow b{color:#fff;font-weight:500;letter-spacing:.3em}
+  .field{
+    display:grid;justify-content:center;
+    --cell:28px;--gap:calc(var(--cell)*0.30);
+    gap:var(--gap);line-height:1;user-select:none;margin:0 auto;
+  }
+  .field.mark{
+    --gap:calc(var(--cell)*0.16);
+    padding:clamp(16px,3vw,28px);border:1px solid rgba(255,255,255,.2);
+    border-radius:14px;width:max-content;max-width:100%;
+  }
+  .cell{
+    width:var(--cell);height:var(--cell);
+    display:flex;align-items:center;justify-content:center;
+    font-size:calc(var(--cell)*0.58);
+    color:#fff;font-weight:400;opacity:.2;
+  }
+  .toolbar{
+    display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,2.2vw,18px);
+    margin-top:clamp(24px,4vw,38px);padding-top:clamp(16px,3vw,24px);
+    border-top:1px solid rgba(255,255,255,.16);
+  }
+  .grp{display:flex;align-items:center;gap:.7em;flex-wrap:wrap}
+  .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+  .seg{display:inline-flex;flex-wrap:wrap;border:1px solid rgba(255,255,255,.25);border-radius:999px;overflow:hidden}
+  .seg button{
+    font-family:var(--mono);font-size:12px;letter-spacing:.04em;padding:.5em 1em;
+    border:0;background:transparent;color:rgba(255,255,255,.6);cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .seg button[aria-pressed="true"]{background:#fff;color:#141110}
+  .seg button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .dots{display:inline-flex;gap:.5em}
+  .dot{width:20px;height:20px;border-radius:999px;border:1px solid rgba(255,255,255,.4);
+    cursor:pointer;padding:0;position:relative;transition:transform .12s}
+  .dot[aria-pressed="true"]{transform:scale(1.16)}
+  .dot[aria-pressed="true"]::after{content:"";position:absolute;inset:-4px;border:1.5px solid #fff;border-radius:999px}
+  .dot:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .ghost{
+    font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:999px;
+    padding:.55em 1.1em;color:#fff;cursor:pointer;transition:background .15s;
+  }
+  .ghost:hover{background:rgba(255,255,255,.1)}
+  .ghost:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .ghost.solid{background:#fff;color:#141110;border-color:#fff;font-weight:500}
+  .ghost.solid:hover{background:rgba(255,255,255,.85)}
+  .hint{margin:clamp(18px,3vw,26px) 0 0;max-width:56ch;font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.55)}
+  .hint b{color:#fff;font-weight:500}
+  .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
+</style>
+</head>
+<body>
+
+<div class="canvas" id="canvas">
+  <div class="stage">
+    <h2 class="sr">Animated prototype: a field of white monospace letters on an electric ground. The characters scramble like a decoding cipher while one word, drawn at random from a pool, stays locked and bright. Choose a word or leave it random, pick a motion mode, play a one-shot reveal, switch form and layout, change the ground colour, shuffle, and download the current frame as a PNG.</h2>
+
+    <p class="eyebrow"><b>BESTEMMIE</b> <span>campo animato &middot; v5w</span></p>
+
+    <div class="field" id="field" role="img" aria-label="An animated field of monospace letters with a hidden word embedded, characters cycling like a cipher."></div>
+
+    <div class="toolbar">
+      <div class="grp">
+        <span class="lbl">Parola</span>
+        <span class="seg" id="word" role="group" aria-label="Parola"></span>
+      </div>
+
+      <div class="grp">
+        <span class="lbl">Form</span>
+        <span class="seg" id="mode" role="group" aria-label="Form">
+          <button data-v="field" aria-pressed="true">Field</button>
+          <button data-v="mark" aria-pressed="false">Mark</button>
+        </span>
+      </div>
+
+      <div class="grp">
+        <span class="lbl">Layout</span>
+        <span class="seg" id="layout" role="group" aria-label="Layout">
+          <button data-v="line" aria-pressed="false">Line</button>
+          <button data-v="scatter" aria-pressed="true">Scatter</button>
+        </span>
+      </div>
+
+      <div class="grp">
+        <span class="lbl">Motion</span>
+        <span class="seg" id="motion" role="group" aria-label="Motion">
+          <button data-v="buried" aria-pressed="false">Buried</button>
+          <button data-v="glow" aria-pressed="false">Glow</button>
+          <button data-v="decode" aria-pressed="true">Decode</button>
+        </span>
+      </div>
+
+      <div class="grp">
+        <span class="lbl">Field</span>
+        <span class="dots" id="ink" role="group" aria-label="Colore del campo"></span>
+      </div>
+
+      <button class="ghost" id="reveal" type="button" title="Play the scramble-to-reveal">Reveal &#9656;</button>
+      <button class="ghost" id="shuffle" type="button">Shuffle</button>
+      <button class="ghost solid" id="dl" type="button" title="Download the current frame as a PNG">Download PNG</button>
+    </div>
+
+    <p class="hint"><b>Shuffle</b> draws a new word from the pool and re-scatters the noise. Pin one with <b>Parola</b> if you want a specific export. <b>Decode</b> is the living cipher — noise churns while the word holds still and bright. <b>Glow</b> stills the letters and lets it breathe; <b>Buried</b> sinks the word back into the noise. <b>Reveal</b> plays the scramble-to-resolve. Screen-record any of it, or grab a still with Download PNG.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var WORDS=["PORCODIO","DIOMERDA","GESÙMERDA","MADONNATROIA"];
+  // Accents sit in the noise too, so the Ù in GESÙMERDA doesn't give the word away.
+  var ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙ";
+  var BASE={field:{cols:13,rows:13},mark:{cols:9,rows:5}};
+  var FIELDS=[
+    {name:"Electric blue",hex:"#2537E8"},
+    {name:"Near black",hex:"#111015"},
+    {name:"Aubergine",hex:"#251043"},
+    {name:"Oxblood",hex:"#3A100C"},
+    {name:"Violet",hex:"#3E0E63"}
+  ];
+  var REDUCE=window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var state={mode:"field",layout:"scatter",motion:REDUCE?"glow":"decode",field:FIELDS[0].hex,
+             pick:"random",word:WORDS[0]};
+
+  var cells=[],cellEls=[],dChar=[],dAlpha=[],dBold=[];
+  var cols=0,rows=0,raf=0;
+  var playing=false,playStart=0,playEnd=2300;
+  var fieldEl=document.getElementById("field");
+
+  function rl(){return ALPHA[(Math.random()*ALPHA.length)|0];}
+  function rnd(a,b){return a+Math.random()*(b-a);}
+
+  function drawWord(){
+    if(state.pick!=="random")return state.pick;
+    var w,g=0;
+    do{w=WORDS[(Math.random()*WORDS.length)|0];g++;}while(w===state.word && g<20);
+    return w;
+  }
+
+  // Cell size is computed rather than clamped in CSS: the word pool has lengths
+  // from 8 to 12, so the column count changes and a fixed clamp overflows narrow screens.
+  function sizeCells(){
+    var stage=fieldEl.parentElement;
+    var avail=stage.clientWidth;
+    var isMark=state.mode==="mark";
+    if(isMark){
+      var cs=getComputedStyle(fieldEl);
+      avail-=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight)+2;
+    }
+    var gapRatio=isMark?0.16:0.30;
+    var maxC=isMark?52:32,minC=isMark?18:12;
+    var cell=avail/(cols+gapRatio*(cols-1));
+    if(cell>maxC)cell=maxC;
+    if(cell<minC)cell=minC;
+    fieldEl.style.setProperty("--cell",cell.toFixed(2)+"px");
+  }
+
+  function build(newWord){
+    if(newWord)state.word=drawWord();
+    var word=state.word;
+    var b=BASE[state.mode];
+    cols=Math.max(b.cols,word.length+(state.mode==="mark"?2:4));
+    rows=b.rows;
+
+    var n=cols*rows,now=performance.now();
+    cells=new Array(n);
+    for(var i=0;i<n;i++){
+      var base=rnd(0.10,0.30); if(Math.random()<0.14)base+=0.12;
+      cells[i]={ch:rl(),cur:"",w:false,lock:0,base:base,
+                phase:rnd(0,Math.PI*2),period:rnd(3.5,8),swapAt:now+rnd(0,1200)};
+      cells[i].cur=cells[i].ch;
+    }
+    function stamp(idx,ch){cells[idx].ch=ch;cells[idx].cur=ch;cells[idx].w=true;}
+    if(state.layout==="line"){
+      var row=(rows/2)|0;
+      var st=((cols-word.length)/2)|0;
+      for(var k=0;k<word.length;k++)stamp(row*cols+st+k,word[k]);
+    } else {
+      var pool={},idxs=[],g=0;
+      while(idxs.length<word.length && g<800){g++;var idx=(Math.random()*n)|0;if(pool[idx])continue;pool[idx]=1;idxs.push(idx);}
+      idxs.sort(function(a,b){return a-b;});
+      for(var j=0;j<word.length;j++)stamp(idxs[j],word[j]);
+    }
+    // lock times in reading order
+    var w=[];for(var q=0;q<n;q++)if(cells[q].w)w.push(q);
+    w.sort(function(a,b){return a-b;});
+    for(var m=0;m<w.length;m++)cells[w[m]].lock=400+m*(1500/Math.max(1,w.length-1));
+
+    // DOM
+    fieldEl.style.gridTemplateColumns="repeat("+cols+",var(--cell))";
+    fieldEl.classList.toggle("mark",state.mode==="mark");
+    fieldEl.innerHTML="";
+    cellEls=new Array(n);dChar=new Array(n);dAlpha=new Array(n);dBold=new Array(n);
+    var frag=document.createDocumentFragment();
+    for(var e=0;e<n;e++){
+      var sp=document.createElement("span");
+      sp.className="cell";sp.textContent=cells[e].ch;
+      dChar[e]=cells[e].ch;dAlpha[e]=cells[e].base;dBold[e]="400";
+      cellEls[e]=sp;frag.appendChild(sp);
+    }
+    fieldEl.appendChild(frag);
+    sizeCells();
+  }
+
+  function paint(i,ch,alpha,bold){
+    var el=cellEls[i];
+    if(dChar[i]!==ch){el.textContent=ch;dChar[i]=ch;}
+    el.style.opacity=alpha.toFixed(3);
+    var w=bold?"700":"400";
+    if(dBold[i]!==w){el.style.fontWeight=w;dBold[i]=w;}
+    dAlpha[i]=alpha;
+  }
+
+  function tick(now){
+    var i,c,ch,alpha,bold;
+    if(playing){
+      var e=now-playStart;
+      for(i=0;i<cells.length;i++){
+        c=cells[i];
+        if(c.w && e>=c.lock){ch=c.ch;alpha=1;bold=true;}
+        else{
+          if(now>=c.swapAt){c.cur=rl();c.swapAt=now+rnd(45,95);}
+          ch=c.cur;alpha=Math.min(c.base+0.04,0.55);bold=false;
+        }
+        paint(i,ch,alpha,bold);
+      }
+      if(e>=playEnd){playing=false;if(state.motion==="buried")setMotion("glow");}
+    } else {
+      for(i=0;i<cells.length;i++){
+        c=cells[i];
+        if(c.w){
+          ch=c.ch;
+          if(state.motion==="buried"){alpha=0.30;bold=false;}
+          else{alpha=1;bold=true;}
+        } else {
+          var tw=REDUCE?0:0.09*Math.sin((now/1000)*(2*Math.PI/c.period)+c.phase);
+          alpha=c.base+tw;if(alpha<0.05)alpha=0.05;if(alpha>0.95)alpha=0.95;
+          if(state.motion==="decode" && !REDUCE && now>=c.swapAt){c.cur=rl();c.swapAt=now+rnd(350,1400);}
+          ch=(state.motion==="decode")?c.cur:c.ch;
+          bold=false;
+        }
+        paint(i,ch,alpha,bold);
+      }
+    }
+    raf=requestAnimationFrame(tick);
+  }
+
+  function updatePressed(id,v){
+    document.getElementById(id).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v);});
+  }
+  function setMotion(m){
+    state.motion=m;updatePressed("motion",m);
+    if(m==="decode"){var now=performance.now();for(var i=0;i<cells.length;i++)if(!cells[i].w)cells[i].swapAt=now+rnd(0,900);}
+  }
+  function play(){var now=performance.now();for(var i=0;i<cells.length;i++)cells[i].swapAt=now;playStart=now;playing=true;}
+
+  // Word picker: "Random" plus one button per word, so a specific export is reachable.
+  var wordSeg=document.getElementById("word");
+  function cap(s){return s.charAt(0)+s.slice(1).toLowerCase();}
+  [{v:"random",label:"Random"}].concat(WORDS.map(function(w){return {v:w,label:cap(w)};}))
+    .forEach(function(o){
+      var b=document.createElement("button");
+      b.type="button";b.dataset.v=o.v;b.textContent=o.label;
+      b.setAttribute("aria-pressed",o.v==="random");
+      b.addEventListener("click",function(){
+        state.pick=o.v;updatePressed("word",o.v);
+        if(o.v!=="random")state.word=o.v;
+        build(o.v==="random");
+      });
+      wordSeg.appendChild(b);
+    });
+
+  function seg(id,key,rebuild){
+    document.getElementById(id).querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click",function(){
+        if(id==="motion"){setMotion(b.dataset.v);return;}
+        state[key]=b.dataset.v;updatePressed(id,b.dataset.v);
+        if(rebuild)build(false);
+      });
+    });
+  }
+  seg("mode","mode",true);
+  seg("layout","layout",true);
+  seg("motion","motion",false);
+
+  var ink=document.getElementById("ink");
+  FIELDS.forEach(function(o,i){
+    var d=document.createElement("button");
+    d.type="button";
+    d.className="dot";d.style.background=o.hex;d.title=o.name;
+    d.setAttribute("aria-label",o.name);d.setAttribute("aria-pressed",i===0);
+    d.addEventListener("click",function(){
+      state.field=o.hex;document.getElementById("canvas").style.setProperty("--field",o.hex);
+      ink.querySelectorAll(".dot").forEach(function(x){x.setAttribute("aria-pressed",x===d);});
+    });
+    ink.appendChild(d);
+  });
+
+  document.getElementById("reveal").addEventListener("click",play);
+  document.getElementById("shuffle").addEventListener("click",function(){build(true);});
+
+  document.getElementById("dl").addEventListener("click",function(){
+    var cell=120,pad=138,fs=Math.round(cell*0.58);
+    var W=cols*cell+pad*2,H=rows*cell+pad*2;
+    var cv=document.createElement("canvas");cv.width=W;cv.height=H;
+    var ctx=cv.getContext("2d");
+    ctx.fillStyle=state.field;ctx.fillRect(0,0,W,H);
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    var fam="ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace";
+    for(var i=0;i<cells.length;i++){
+      var col=i%cols,row=(i/cols)|0;
+      var x=pad+col*cell+cell/2,y=pad+row*cell+cell/2;
+      ctx.globalAlpha=Math.max(0.04,Math.min(1,dAlpha[i]));
+      ctx.fillStyle="#ffffff";
+      ctx.font=(dBold[i]==="700"?"bold ":"")+fs+"px "+fam;
+      ctx.fillText(dChar[i],x,y);
+    }
+    ctx.globalAlpha=1;
+    cv.toBlob(function(blob){
+      if(!blob)return;
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url;a.download=state.word.toLowerCase()+"-"+state.mode+"-"+state.layout+".png";
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1200);
+    },"image/png");
+  });
+
+  var rt=0;
+  window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(sizeCells,120);});
+
+  build(true);
+  raf=requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
