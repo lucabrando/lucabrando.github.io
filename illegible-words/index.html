@@ -180,8 +180,10 @@
       var cs=getComputedStyle(fieldEl);
       avail-=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight)+2;
     }
+    // Caps sit above what the stage can produce, so the mark spans the full
+    // stage at every word length — the lockup width stays put as words change.
     var gapRatio=isMark?0.16:0.30;
-    var maxC=isMark?52:32,minC=isMark?18:12;
+    var maxC=isMark?60:40,minC=isMark?18:12;
     var cell=avail/(cols+gapRatio*(cols-1));
     if(cell>maxC)cell=maxC;
     if(cell<minC)cell=minC;
