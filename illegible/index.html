@@ -222,7 +222,7 @@
 
       <button class="ghost" id="reveal" type="button" title="Play the scramble-to-reveal">Reveal &#9656;</button>
       <button class="ghost" id="shuffle" type="button">Shuffle</button>
-      <button class="ghost" id="dlsvg" type="button" hidden title="Download the favicon as SVG">Download SVG</button>
+      <button class="ghost" id="dlsvg" type="button" title="Download the current frame as SVG">Download SVG</button>
       <button class="ghost solid" id="dl" type="button" title="Download the current frame as a PNG">Download PNG</button>
     </div>
 
@@ -564,8 +564,28 @@
     return "illegible-favicon-"+fav.lv.join("")+"-"+state.field.replace("#","");
   }
 
+  /* Vector twin of the field/mark PNG export: same geometry, same cell state,
+     so a frame can be saved as SVG instead of being lost to the next shuffle. */
+  function markSvg(){
+    var cell=120,pad=138,fs=60;
+    var W=cols*cell+pad*2,H=rows*cell+pad*2;
+    var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'">';
+    s+='<rect width="'+W+'" height="'+H+'" fill="'+state.field+'"/>';
+    s+='<g font-family="'+MONO+'" font-size="'+fs+'" fill="'+state.ink+'" text-anchor="middle">';
+    for(var i=0;i<cells.length;i++){
+      var col=i%cols,row=(i/cols)|0;
+      var x=pad+col*cell+cell/2,y=pad+row*cell+cell/2+fs*0.35;
+      var a=Math.max(0.04,Math.min(1,dAlpha[i])),bold=dBold[i]==="700";
+      s+='<text x="'+x+'" y="'+y.toFixed(0)+'" fill-opacity="'+a.toFixed(3)+'"'+
+         (bold?' font-weight="700"':"")+'>'+dChar[i]+'</text>';
+    }
+    return s+'</g></svg>';
+  }
+
   document.getElementById("dlsvg").addEventListener("click",function(){
-    saveBlob(new Blob([favSvg()],{type:"image/svg+xml"}),favName()+".svg");
+    var svg=state.mode==="favicon"?favSvg():markSvg();
+    var name=state.mode==="favicon"?favName():("illegible-"+state.mode+"-"+state.layout);
+    saveBlob(new Blob([svg],{type:"image/svg+xml"}),name+".svg");
   });
 
   function applyMode(){
@@ -575,7 +595,6 @@
     ["grpPattern","grpDim","grpMid","grpRadius","grpFx"].forEach(function(id){document.getElementById(id).hidden=!f;});
     ["grpLayout","grpMotion"].forEach(function(id){document.getElementById(id).hidden=f;});
     document.getElementById("reveal").hidden=f;
-    document.getElementById("dlsvg").hidden=!f;
     document.getElementById("hintMark").hidden=f;
     document.getElementById("hintFav").hidden=!f;
     if(f)renderFav();
