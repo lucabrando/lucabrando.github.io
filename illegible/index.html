@@ -27,16 +27,23 @@
   *{box-sizing:border-box}
   .canvas{
     background:var(--field);min-height:100%;
+    /* All chrome ink derives from --k/--kk, so a light field can invert the
+       whole page instead of leaving white text on paper. */
+    --k:255,255,255;--kk:#fff;--kinv:#141110;--stage:#E9E6DF;--stageInk:20,17,16;
     padding:clamp(22px,4vw,46px) clamp(16px,4vw,40px) clamp(28px,5vw,52px);
-    font-family:var(--mono);color:#fff;transition:background .4s ease;
+    font-family:var(--mono);color:var(--kk);
+    /* No colour transition here. Transitioning background/color left the
+       property frozen at its old value when the field changed, which on a
+       light field means dark text on the previous dark ground. */
   }
+  .canvas.light{--k:28,20,16;--kk:#1C1410;--kinv:#F5EFE3;--stage:#2A2622;--stageInk:245,239,227}
   .stage{max-width:600px;margin:0 auto}
   .eyebrow{
     display:flex;align-items:baseline;gap:.6em;flex-wrap:wrap;
     font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-    color:rgba(255,255,255,.55);margin:0 0 clamp(20px,3.5vw,34px);
+    color:rgba(var(--k),.55);margin:0 0 clamp(20px,3.5vw,34px);
   }
-  .eyebrow b{color:#fff;font-weight:500;letter-spacing:.3em}
+  .eyebrow b{color:var(--kk);font-weight:500;letter-spacing:.3em}
   .field{
     display:grid;justify-content:center;
     --cell:clamp(20px,4.2vw,32px);--gap:calc(var(--cell)*0.30);
@@ -44,47 +51,46 @@
   }
   .field.mark{
     --cell:clamp(30px,8vw,52px);--gap:calc(var(--cell)*0.16);
-    padding:clamp(16px,3vw,28px);border:1px solid rgba(255,255,255,.2);
+    padding:clamp(16px,3vw,28px);border:1px solid rgba(var(--k),.2);
     border-radius:14px;width:max-content;max-width:100%;
   }
   .cell{
     width:var(--cell);height:var(--cell);
     display:flex;align-items:center;justify-content:center;
     font-size:calc(var(--cell)*0.58);
-    color:#fff;font-weight:400;opacity:.2;
+    color:var(--kk);font-weight:400;opacity:.2;
   }
   .toolbar{
     display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,2.2vw,18px);
     margin-top:clamp(24px,4vw,38px);padding-top:clamp(16px,3vw,24px);
-    border-top:1px solid rgba(255,255,255,.16);
+    border-top:1px solid rgba(var(--k),.16);
   }
   .grp{display:flex;align-items:center;gap:.7em}
-  .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-  .seg{display:inline-flex;border:1px solid rgba(255,255,255,.25);border-radius:999px;overflow:hidden}
+  .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--k),.5)}
+  .seg{display:inline-flex;border:1px solid rgba(var(--k),.25);border-radius:999px;overflow:hidden}
   .seg button{
     font-family:var(--mono);font-size:12px;letter-spacing:.04em;padding:.5em 1em;
-    border:0;background:transparent;color:rgba(255,255,255,.6);cursor:pointer;
-    transition:background .15s,color .15s;
+    border:0;background:transparent;color:rgba(var(--k),.6);cursor:pointer;
   }
-  .seg button[aria-pressed="true"]{background:#fff;color:#141110}
-  .seg button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .seg button[aria-pressed="true"]{background:var(--kk);color:var(--kinv)}
+  .seg button:focus-visible{outline:2px solid var(--kk);outline-offset:2px}
   .dots{display:inline-flex;gap:.5em}
-  .dot{width:20px;height:20px;border-radius:999px;border:1px solid rgba(255,255,255,.4);
+  .dot{width:20px;height:20px;border-radius:999px;border:1px solid rgba(var(--k),.4);
     cursor:pointer;padding:0;position:relative;transition:transform .12s}
   .dot[aria-pressed="true"]{transform:scale(1.16)}
-  .dot[aria-pressed="true"]::after{content:"";position:absolute;inset:-4px;border:1.5px solid #fff;border-radius:999px}
-  .dot:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .dot[aria-pressed="true"]::after{content:"";position:absolute;inset:-4px;border:1.5px solid var(--kk);border-radius:999px}
+  .dot:focus-visible{outline:2px solid var(--kk);outline-offset:3px}
   .ghost{
     font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-    background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:999px;
-    padding:.55em 1.1em;color:#fff;cursor:pointer;transition:background .15s;
+    background:transparent;border:1px solid rgba(var(--k),.35);border-radius:999px;
+    padding:.55em 1.1em;color:var(--kk);cursor:pointer;
   }
-  .ghost:hover{background:rgba(255,255,255,.1)}
-  .ghost:focus-visible{outline:2px solid #fff;outline-offset:2px}
-  .ghost.solid{background:#fff;color:#141110;border-color:#fff;font-weight:500}
-  .ghost.solid:hover{background:rgba(255,255,255,.85)}
-  .hint{margin:clamp(18px,3vw,26px) 0 0;max-width:56ch;font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.55)}
-  .hint b{color:#fff;font-weight:500}
+  .ghost:hover{background:rgba(var(--k),.1)}
+  .ghost:focus-visible{outline:2px solid var(--kk);outline-offset:2px}
+  .ghost.solid{background:var(--kk);color:var(--kinv);border-color:var(--kk);font-weight:500}
+  .ghost.solid:hover{background:rgba(var(--k),.85)}
+  .hint{margin:clamp(18px,3vw,26px) 0 0;max-width:56ch;font-size:12.5px;line-height:1.65;color:rgba(var(--k),.55)}
+  .hint b{color:var(--kk);font-weight:500}
   .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
 
   /* ---- favicon studio ---- */
@@ -95,7 +101,7 @@
   /* The tile is the same colour as the page, so it needs a neutral stage or its
      silhouette and corner radius are invisible. */
   .favstage{
-    background:#E9E6DF;border-radius:16px;width:100%;
+    background:var(--stage);border-radius:16px;width:100%;
     padding:clamp(20px,4vw,32px);display:flex;flex-direction:column;
     align-items:center;gap:clamp(20px,3.5vw,30px);
   }
@@ -107,12 +113,12 @@
     border:0;background:transparent;cursor:pointer;border-radius:6px;
     transition:background .12s,box-shadow .12s;
   }
-  .hit button:hover{background:rgba(255,255,255,.09)}
-  .hit button:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+  .hit button:hover{background:rgba(var(--k),.09)}
+  .hit button:focus-visible{outline:2px solid var(--kk);outline-offset:-3px}
   .sizes{display:flex;align-items:flex-end;justify-content:center;gap:clamp(16px,4vw,30px);flex-wrap:wrap}
   .size{display:flex;flex-direction:column;align-items:center;gap:.65em}
   .size img{display:block;image-rendering:auto}
-  .size span{font-size:9.5px;letter-spacing:.16em;color:rgba(20,17,16,.5)}
+  .size span{font-size:9.5px;letter-spacing:.16em;color:rgba(var(--stageInk),.55)}
   .tabs{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
   .tabrow{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px 9px 0 0;font-size:11px;letter-spacing:.02em}
   .tabrow img{width:16px;height:16px;flex:none;border-radius:3px}
@@ -120,10 +126,10 @@
   .tabrow.light b{background:#fff;padding:6px 10px;border-radius:8px 8px 0 0;font-weight:400;display:flex;align-items:center;gap:8px;margin:-7px 0 -7px -10px}
   .tabrow.dark{background:#202124;color:#e8eaed}
   .tabrow.dark b{background:#35363a;padding:6px 10px;border-radius:8px 8px 0 0;font-weight:400;display:flex;align-items:center;gap:8px;margin:-7px 0 -7px -10px}
-  .rng{-webkit-appearance:none;appearance:none;width:110px;height:2px;background:rgba(255,255,255,.3);border-radius:2px;outline:0}
-  .rng::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#fff;cursor:pointer}
-  .rng::-moz-range-thumb{width:13px;height:13px;border:0;border-radius:50%;background:#fff;cursor:pointer}
-  .val{font-size:11px;color:rgba(255,255,255,.7);min-width:2.6em}
+  .rng{-webkit-appearance:none;appearance:none;width:110px;height:2px;background:rgba(var(--k),.3);border-radius:2px;outline:0}
+  .rng::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--kk);cursor:pointer}
+  .rng::-moz-range-thumb{width:13px;height:13px;border:0;border-radius:50%;background:var(--kk);cursor:pointer}
+  .val{font-size:11px;color:rgba(var(--k),.7);min-width:2.6em}
 </style>
 
 <div class="canvas" id="canvas">
@@ -231,15 +237,19 @@
   var WORD="ILLEGIBLE";
   var ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var CFG={field:{cols:13,rows:13},mark:{cols:9,rows:5}};
+  /* ink is the letter colour on that field. Paper is the illegible.world
+     background, paired with that site's own ink so the mark matches it exactly. */
   var FIELDS=[
-    {name:"Electric blue",hex:"#2537E8"},
-    {name:"Near black",hex:"#111015"},
-    {name:"Aubergine",hex:"#251043"},
-    {name:"Oxblood",hex:"#3A100C"},
-    {name:"Violet",hex:"#3E0E63"}
+    {name:"Electric blue",hex:"#2537E8",ink:"#FFFFFF"},
+    {name:"Near black",hex:"#111015",ink:"#FFFFFF"},
+    {name:"Aubergine",hex:"#251043",ink:"#FFFFFF"},
+    {name:"Oxblood",hex:"#3A100C",ink:"#FFFFFF"},
+    {name:"Violet",hex:"#3E0E63",ink:"#FFFFFF"},
+    {name:"Paper (illegible.world)",hex:"#F5EFE3",ink:"#1C1410"}
   ];
   var REDUCE=window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var state={mode:"field",layout:"scatter",motion:REDUCE?"glow":"decode",field:FIELDS[0].hex};
+  var state={mode:"field",layout:"scatter",motion:REDUCE?"glow":"decode",
+             field:FIELDS[0].hex,ink:FIELDS[0].ink};
 
   var cells=[],cellEls=[],dChar=[],dAlpha=[],dBold=[];
   var cols=0,rows=0,raf=0;
@@ -365,12 +375,23 @@
     d.className="dot";d.style.background=o.hex;d.title=o.name;
     d.setAttribute("aria-label",o.name);d.setAttribute("aria-pressed",i===0);
     d.addEventListener("click",function(){
-      state.field=o.hex;document.getElementById("canvas").style.setProperty("--field",o.hex);
+      setField(o);
       ink.querySelectorAll(".dot").forEach(function(x){x.setAttribute("aria-pressed",x===d);});
-      if(state.mode==="favicon")renderFav();
     });
     ink.appendChild(d);
   });
+
+  function setField(o){
+    state.field=o.hex;state.ink=o.ink;
+    var cv=document.getElementById("canvas");
+    cv.style.setProperty("--field",o.hex);
+    // A field whose ink is not white is a light field: invert the page chrome.
+    cv.classList.toggle("light",o.ink!=="#FFFFFF");
+    document.documentElement.style.background=o.hex;
+    var tc=document.querySelector('meta[name="theme-color"]');
+    if(tc)tc.setAttribute("content",o.hex);
+    if(state.mode==="favicon")renderFav();
+  }
 
   document.getElementById("reveal").addEventListener("click",play);
   document.getElementById("shuffle").addEventListener("click",function(){
@@ -473,7 +494,7 @@
       '<feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/>'+
       '<feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
     s+='<rect width="'+S+'" height="'+S+'" rx="'+rx+'" fill="'+state.field+'"/>';
-    s+='<g font-family="'+MONO+'" font-size="'+FS.toFixed(2)+'" fill="#fff" text-anchor="middle">';
+    s+='<g font-family="'+MONO+'" font-size="'+FS.toFixed(2)+'" fill="'+state.ink+'" text-anchor="middle">';
     for(var i=0;i<9;i++){
       var col=i%3,row=(i/3)|0;
       var x=(C*col+C/2).toFixed(2),y=(C*row+C/2+FS*0.35).toFixed(2);
@@ -520,9 +541,9 @@
       var col=i%3,row=(i/3)|0;
       var full=fav.lv[i]===2;
       ctx.globalAlpha=favAlpha(i);
-      ctx.fillStyle="#fff";
+      ctx.fillStyle=state.ink;
       ctx.font=(full?"bold ":"")+fs.toFixed(2)+"px "+MONO;
-      if(fav.glow&&full){ctx.shadowColor="rgba(255,255,255,.9)";ctx.shadowBlur=S*0.028;}
+      if(fav.glow&&full){ctx.shadowColor=state.ink;ctx.shadowBlur=S*0.028;}
       else ctx.shadowBlur=0;
       ctx.fillText(WORD[i],C*col+C/2,C*row+C/2);
     }
@@ -595,7 +616,7 @@
       var col=i%cols,row=(i/cols)|0;
       var x=pad+col*cell+cell/2,y=pad+row*cell+cell/2;
       ctx.globalAlpha=Math.max(0.04,Math.min(1,dAlpha[i]));
-      ctx.fillStyle="#ffffff";
+      ctx.fillStyle=state.ink;
       ctx.font=(dBold[i]==="700"?"bold ":"")+fs+"px "+fam;
       ctx.fillText(dChar[i],x,y);
     }
