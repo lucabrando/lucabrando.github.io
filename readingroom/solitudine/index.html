@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Solitudine — Ogni ferita è una feritoia</title>
+<meta name="description" content="Capitolo «Solitudine», da «Ogni ferita è una Feritoia, è da lì che entra luce.» di Serena Malaspina.">
+<meta name="theme-color" content="#0E0D12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230E0D12'/%3E%3Crect x='14' y='6' width='4' height='20' fill='%23E8C37A'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --ground:#0E0D12;
+    --ink:#F3F1EC;
+    --muted:rgba(243,241,236,.45);
+    --soft:rgba(243,241,236,.72);
+    --rule:rgba(243,241,236,.14);
+    --light:#E8C37A;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  }
+  /* Paper mode: the same page, read on light ground. Every colour below
+     derives from these tokens so one attribute flips the whole chapter. */
+  :root[data-theme="paper"]{
+    --ground:#F4F1EA;
+    --ink:#171512;
+    --muted:rgba(23,21,18,.5);
+    --soft:rgba(23,21,18,.78);
+    --rule:rgba(23,21,18,.14);
+    --light:#8A6420;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--serif);
+    padding:clamp(28px,6vw,72px) 16px clamp(56px,10vw,120px);
+    transition:background .25s ease,color .25s ease;
+  }
+  main{width:100%;max-width:34rem;margin:0 auto}
+
+  /* ── chrome ─────────────────────────────────────────── */
+  .top{
+    display:flex;align-items:baseline;justify-content:space-between;gap:1em;
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    margin:0 0 clamp(40px,8vw,84px);
+  }
+  .top a,.top button{
+    color:var(--muted);text-decoration:none;font:inherit;letter-spacing:inherit;
+    background:none;border:0;padding:0;cursor:pointer;transition:color .18s ease;
+  }
+  .top a:hover,.top a:focus-visible,.top button:hover,.top button:focus-visible{color:var(--ink)}
+  :is(a,button):focus-visible{outline:1px solid var(--ink);outline-offset:3px;border-radius:2px}
+
+  /* ── title block ────────────────────────────────────── */
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 1.4em;
+  }
+  h1{
+    margin:0 0 .6em;font-weight:400;font-size:clamp(34px,9vw,54px);
+    letter-spacing:.02em;line-height:1.05;
+  }
+  .byline{
+    margin:0 0 clamp(36px,7vw,64px);font-family:var(--mono);
+    font-size:12px;line-height:1.9;letter-spacing:.04em;color:var(--muted);
+  }
+  .byline em{font-style:normal;color:var(--soft)}
+
+  /* ── the chapter ────────────────────────────────────── */
+  blockquote.epigraph{
+    margin:0 0 clamp(36px,7vw,64px);padding:0 0 0 1.2em;
+    border-left:1px solid var(--light);
+    font-size:clamp(18px,4.4vw,21px);line-height:1.62;color:var(--soft);font-style:italic;
+  }
+  blockquote.epigraph cite{
+    display:block;margin-top:.9em;font-family:var(--mono);font-style:normal;
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  }
+  p{margin:0 0 1.35em;font-size:clamp(17px,4.3vw,19px);line-height:1.78;letter-spacing:.005em}
+  p.lead::first-letter{
+    float:left;font-size:3.1em;line-height:.84;padding:.06em .1em 0 0;color:var(--light);
+  }
+  .break{
+    margin:clamp(30px,6vw,46px) 0;text-align:center;color:var(--muted);
+    font-family:var(--mono);font-size:12px;letter-spacing:.9em;text-indent:.9em;
+  }
+  p.turn{font-size:clamp(18px,4.5vw,21px);line-height:1.62;color:var(--ink)}
+
+  /* ── questions ──────────────────────────────────────── */
+  section.questions{
+    margin-top:clamp(48px,9vw,88px);padding-top:clamp(30px,6vw,44px);
+    border-top:1px solid var(--rule);
+  }
+  h2{
+    margin:0 0 1.4em;font-family:var(--mono);font-weight:400;
+    font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);
+  }
+  ol{margin:0;padding:0;list-style:none;counter-reset:q}
+  ol li{
+    counter-increment:q;position:relative;padding:0 0 1.25em 2.6em;
+    font-size:clamp(16px,4.1vw,18px);line-height:1.68;color:var(--soft);
+  }
+  ol li::before{
+    content:counter(q,decimal-leading-zero);position:absolute;left:0;top:.42em;
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--light);
+  }
+
+  /* ── colophon ───────────────────────────────────────── */
+  footer{
+    margin-top:clamp(48px,9vw,88px);padding-top:clamp(24px,5vw,34px);
+    border-top:1px solid var(--rule);
+    font-family:var(--mono);font-size:11px;line-height:2;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  footer a{color:var(--soft);text-decoration:none;border-bottom:1px solid var(--rule)}
+  footer a:hover,footer a:focus-visible{color:var(--ink);border-color:currentColor}
+
+  @media print{
+    body{background:#fff;color:#000;padding:0}
+    .top,footer{display:none}
+  }
+</style>
+</head>
+<body>
+<main>
+  <nav class="top">
+    <a href="/readingroom/">← Reading room</a>
+    <button type="button" id="theme" aria-label="Cambia sfondo">Paper</button>
+  </nav>
+
+  <p class="eyebrow">Capitolo</p>
+  <h1>Solitudine</h1>
+  <p class="byline">
+    Da <em>«Ogni ferita è una Feritoia, è da lì che entra luce.»</em><br>
+    di Serena Malaspina
+  </p>
+
+  <blockquote class="epigraph">
+    «L'indipendenza, che è la mia forza, implica la solitudine, che è la mia debolezza.»
+    <cite>Pier Paolo Pasolini</cite>
+  </blockquote>
+
+  <p class="lead">Questa frase mi è rimasta dentro come una firma per anni perché descriveva perfettamente quella dualità che mi portavo dentro: da una parte viaggiare, avere tanti amici, fare tante cose diverse, avere coraggio. Dall'altra, il distacco, la diffidenza, l'estremo individualismo erano la gabbia d'oro che mi separava dall'intimità più autentica.</p>
+
+  <p>E non parlo quindi nemmeno troppo della solitudine fisica, ma di quella esistenziale. La sensazione profonda di essere fondamentalmente diversa, incompresa, separata dal mondo da una barriera invisibile che solo io riuscivo a percepire. Che nasce spesso dal rifiuto di parti di noi che consideriamo inaccettabili, incondivisibili.</p>
+
+  <p>Nel mio caso, crescendo, ho sempre percepito la mia parte femminile - sotto certi aspetti - come qualcosa di debole. Vedevo mia madre che non riusciva ad affermarsi, che veniva trattata male da mio padre, che viveva la propria vita da vittima.</p>
+
+  <p>Quasi per contrasto, ho sviluppato aspetti opposti. Le mie scelte sono diventate razionali, orientate all'efficienza, all'assertività. Ho privilegiato le amicizie maschili perché mi davano un senso di potere. Gli aspetti più maschili - coraggio, forza, indipendenza - mi sembravano più rilevanti, più rispettati.</p>
+
+  <p>Gli episodi dolorosi con le amicizie femminili degli anni precedenti avevano rafforzato in me una convinzione pericolosa: che le donne in gruppo fossero superficiali, invidiose e ipocrite. Mi sbagliavo. Questa mentalità mi aveva portata a cambiare sempre, ad avere tante compagnie di amicizie diverse ma senza fidarmi davvero, e inevitabilmente verso una solitudine interna ancora più profonda.</p>
+
+  <p>Dopo i traumi dell'adolescenza, quella rabbia e ingiustizia che avevo vissuto passivamente, senza buttarle fuori, sono finite per rivoltarsi contro di me: autocritica, giudizio, dialogo interiore svalutante che mi faceva credere che non mi meritassi nulla di bello.</p>
+
+  <p>Da lì è partita una fase autodistruttiva: feste, alcol, droghe, brutte compagnie. Non volevo stare a casa, non volevo stare sola con i miei pensieri, non volevo pensare. Ero entrata in modalità fuga da me stessa, dall'abisso che avevo dentro, dalla vergogna. Quella fase, per quanto distruttiva, ho realizzato con il tempo essere stato il mio modo di sopravvivere. Anche se, dentro, mi stava distruggendo un po' alla volta.</p>
+
+  <p class="break">· · ·</p>
+
+  <p class="turn">Il punto di svolta è arrivato attraverso un dolore diverso, non evitabile, né silenziabile: quando, a 17 anni, ho perso il mio migliore amico. Lui aveva appena vent'anni ed è morto, da un momento all'altro, per un aneurisma cerebrale.</p>
+
+  <p>Lì, qualcosa è cambiato drasticamente.</p>
+
+  <blockquote class="epigraph">«Hai una bella testa e un gran cuore, non buttarti via.»</blockquote>
+
+  <p>Era solito ripetermi in quegli anni di perdizione, ma io non gli credevo.</p>
+
+  <p>Quel lutto mi ha travolta, costringendomi a fermarmi e a sentirlo tutto. E questa volta il trauma non era silenzioso, né individuale, era condiviso: oltre a me, lo provavano tutta la compagnia di amici, la sua famiglia e il paese intero.</p>
+
+  <p>Il dolore, e la sua elaborazione, avvenivano collettivamente. A volte con gli amici di allora ci incontravamo, ci sedevamo sulle panchine del paese, e stavamo in silenzio per ore. E quello, anche se non lo capivamo, era una sorta di guarigione. Per la prima volta ho sperimentato il potere curativo del contatto autentico attorno al dolore.</p>
+
+  <p>Da quell'evento ho capito, paradossalmente, l'importanza del vivere veramente. Ho realizzato quanto stessi sprecando la mia vita con meccanismi di autosabotaggio. E gli ho promesso che non sarei più stata vittima della mia vita, del mio passato, ma che avrei preso in mano il timone.</p>
+
+  <p>Ma il vero momento catartico sulla connessione attorno al dolore, all'autenticità, è arrivato anni dopo, quando ho iniziato il progetto Essere Serena.</p>
+
+  <p class="break">· · ·</p>
+
+  <p>Condividendo a persone sconosciuti i miei vissuti emotivi - dopo anni di negazione e vergogna - ho scoperto una verità rivoluzionaria: che c'erano moltissime persone che potevano capirmi. Tantissime persone che si ritrovavano nelle mie esperienze.</p>
+
+  <p>Ho visto nascere una catena d'amore, un abbraccio comune verso la propria vulnerabilità. Mi sono resa conto della forza collettiva che si attiva quando scegliamo di non stare più da sole, in silenzio. Ho percepito una condizione condivisa tra persone in rinascita, in riconnessione con sé stesse. Ognuna che ha vissuto esperienze diverse, ma accumunate da vissuti profondi comuni. E che, a un certo punto, decidono di non esserne più vittime.</p>
+
+  <p>E ancora troppo spesso questo lavoro è iper-individuale, quindi isolante. Risulta troppo rischioso connettersi con chi potrebbe non capire certi aspetti di te o, peggio, li giudicherebbe denigrandoti. Invece, sapere di non essere sole, entrare in contatto con chi vive le stesse cose, con chi è in evoluzione costante... è potente.</p>
+
+  <p>Riconoscere che ci sono persone che stanno prendendo in mano la propria vita invece di vittimizzarsi passivamente è stato uno spartiacque. La solitudine si spezza quando scopri che non sei l'unica a combattere le tue battaglie.</p>
+
+  <p>Il contatto autentico non è solo connessione sociale. È riconoscimento reciproco. È vedere riflessa in un'altra persona la propria umanità, le proprie lotte, le proprie possibilità di guarigione.</p>
+
+  <p class="turn">La vulnerabilità condivisa non è debolezza. È la forza più grande che esista.</p>
+
+  <p>Il paradosso è che per uscire dalla solitudine devi prima accettare di starci dentro. Devi smettere di fuggire da te stessa. Devi fare pace con le parti di te che hai rifiutato. Perché è quando smetti di essere sola con te stessa, quando inizi ad accoglierti, che puoi sentirti davvero connessa anche con gli altri.</p>
+
+  <p class="turn">Il contatto inizia dall'interno. E, dopo, si espande verso il mondo.</p>
+
+  <section class="questions">
+    <h2>Domande di consapevolezza</h2>
+    <ol>
+      <li>Che sensazione sento quando penso alla «solitudine»?</li>
+      <li>Ci sono stati, o ci sono, momenti nei quali sento una solitudine esistenziale? È fisica, emotiva o entrambi?</li>
+      <li>Che relazione ho con la mia parte interiore «sola»?</li>
+      <li>Ci sono modi in cui mi ritrovo a fuggire dalla solitudine? O, al contrario, dal contatto con l'altro?</li>
+      <li>In quali modi posso onorare la mia solitudine?</li>
+      <li>Se la tua versione passata incontrasse la tua di oggi, di quali progressi sarebbe fiera?</li>
+      <li>In quali momenti mi sento parte di qualcosa?</li>
+    </ol>
+  </section>
+
+  <footer>
+    Da «Ogni ferita è una Feritoia, è da lì che entra luce.» di Serena Malaspina<br>
+    <a href="capitolo-solitudine.pdf">Scarica il PDF ↓</a>
+  </footer>
+</main>
+
+<script>
+  // Theme choice is a per-reader convenience; storage can throw in private
+  // windows, so every access is guarded and the page renders fine without it.
+  (function(){
+    var btn = document.getElementById('theme'), root = document.documentElement;
+    function label(){ btn.textContent = root.getAttribute('data-theme') === 'paper' ? 'Dark' : 'Paper'; }
+    try{ if(localStorage.getItem('rr-theme') === 'paper') root.setAttribute('data-theme','paper'); }catch(e){}
+    label();
+    btn.addEventListener('click', function(){
+      var paper = root.getAttribute('data-theme') === 'paper';
+      if(paper){ root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme','paper'); }
+      try{ localStorage.setItem('rr-theme', paper ? 'dark' : 'paper'); }catch(e){}
+      label();
+    });
+  })();
+</script>
+</body>
+</html>
