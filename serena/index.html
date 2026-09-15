@@ -32,13 +32,6 @@
   }
   main{width:100%;max-width:35rem;margin:0 auto}
 
-  /* ── chrome ─────────────────────────────────────────── */
-  .top{
-    font-size:14px;letter-spacing:.14em;text-transform:uppercase;
-    margin:0 0 clamp(40px,8vw,84px);
-  }
-  .top a{color:var(--muted);text-decoration:none;transition:color .18s ease}
-  .top a:hover,.top a:focus-visible{color:var(--ink)}
   a:focus-visible{outline:1px solid var(--ink);outline-offset:3px;border-radius:2px}
 
   /* ── title block ────────────────────────────────────── */
@@ -109,16 +102,12 @@
 
   @media print{
     body{padding:0}
-    .top,footer{display:none}
+    footer{display:none}
   }
 </style>
 </head>
 <body>
 <main>
-  <nav class="top">
-    <a href="/">← lucabrando</a>
-  </nav>
-
   <p class="eyebrow">Capitolo</p>
   <h1>Solitudine</h1>
   <p class="byline">
